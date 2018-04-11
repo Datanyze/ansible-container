@@ -246,10 +246,12 @@ def get_role_fingerprint(role_name):
         meta_main_path = os.path.join(role_path, 'meta', 'main.yml')
         if os.path.exists(meta_main_path):
             meta_main = yaml.safe_load(open(meta_main_path))
-            for dependency in meta_main.get('dependencies', []):
-                yield dependency.get('role', None)
-        else:
-            yield None
+            if meta_main:
+                for dependency in meta_main.get('dependencies', []):
+                    if isinstance(dependency, dict):
+                        yield dependency.get('role', None)
+                    else:
+                        yield dependency
 
     hash_obj = hashlib.sha256()
     # Account for variables passed to the role by including the invocation string
